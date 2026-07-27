@@ -1,0 +1,16 @@
+{
+  "_comment": "Reference launch template config for the producer/Flask Auto Scaling Group. Fill in ImageId (a recent Amazon Linux 2023 AMI for your region) and pass this via create_asg.py.",
+  "LaunchTemplateName": "bus-reliability-producer-lt",
+  "LaunchTemplateData": {
+    "ImageId": "ami-REPLACE_WITH_REGION_AMI",
+    "InstanceType": "t3.small",
+    "IamInstanceProfile": { "Name": "EMR_EC2_DefaultRole" },
+    "UserData": "REPLACE_WITH_BASE64_ENCODED_user_data.sh",
+    "TagSpecifications": [
+      {
+        "ResourceType": "instance",
+        "Tags": [{ "Key": "Project", "Value": "bus-reliability-platform" }]
+      }
+    ]
+  }
+}

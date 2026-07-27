@@ -1,0 +1,25 @@
+{
+  "_comment": "DynamoDB table backing the speed layer's sliding window (see speed_layer/lambda_function.py). GSI partitions on a constant 'shard' key and sorts by 'ts' so a single Query with ts >= now-window returns exactly the current window's events. TTL on 'ttl' auto-expires old events so the table doesn't grow unboundedly.",
+  "TableName": "bus-speed-events",
+  "KeySchema": [
+    { "AttributeName": "event_id", "KeyType": "HASH" }
+  ],
+  "AttributeDefinitions": [
+    { "AttributeName": "event_id", "AttributeType": "S" },
+    { "AttributeName": "shard", "AttributeType": "S" },
+    { "AttributeName": "ts", "AttributeType": "N" }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "shard-ts-index",
+      "KeySchema": [
+        { "AttributeName": "shard", "KeyType": "HASH" },
+        { "AttributeName": "ts", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" },
+      "ProvisionedThroughput": { "ReadCapacityUnits": 5, "WriteCapacityUnits": 5 }
+    }
+  ],
+  "ProvisionedThroughput": { "ReadCapacityUnits": 5, "WriteCapacityUnits": 5 },
+  "TimeToLiveSpecification": { "AttributeName": "ttl", "Enabled": true }
+}

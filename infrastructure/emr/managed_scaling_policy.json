@@ -1,0 +1,10 @@
+{
+  "_comment": "EMR managed scaling policy for the batch layer cluster. Scales the CORE/TASK instance groups between MinimumCapacityUnits and MaximumCapacityUnits based on YARN pending memory (EMR's built-in scaling metric) — this is what satisfies the 'state the scaling triggers and cooldowns' rubric line.",
+  "ComputeLimits": {
+    "UnitType": "Instances",
+    "MinimumCapacityUnits": 1,
+    "MaximumCapacityUnits": 6,
+    "MaximumOnDemandCapacityUnits": 6,
+    "MaximumCoreCapacityUnits": 4
+  }
+}

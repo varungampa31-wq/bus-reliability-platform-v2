@@ -1,0 +1,32 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Env
+.env
+
+# Data (generated at runtime)
+data/stream/
+data/processed/
+data/batch-layer/
+data/speed-layer/
+data/serving/
+benchmark/results/*.png
+benchmark/results/*.csv
+benchmark/results/tmp_*
+
+# Build artifacts
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

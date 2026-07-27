@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dublin Bus — Live Network Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body>
+
+<header class="board-header">
+    <div class="board-header__brand">
+        <span class="board-header__mark">DB</span>
+        <div>
+            <h1>Dublin Bus Network Status</h1>
+            <p>Live reliability across the network, updated automatically</p>
+        </div>
+    </div>
+    <div class="board-header__clock" id="lastUpdated">—</div>
+</header>
+
+<main class="page">
+
+    <section class="board-strip" aria-label="Network summary">
+        <div class="board-chip">
+            <span class="board-chip__label">Routes monitored</span>
+            <span class="board-chip__value" id="totalRoutes">—</span>
+        </div>
+        <div class="board-chip">
+            <span class="board-chip__label">Live update window</span>
+            <span class="board-chip__value" id="windowSeconds">—</span>
+        </div>
+        <div class="board-chip">
+            <span class="board-chip__label">Recent activity</span>
+            <span class="board-chip__value" id="eventsInWindow">—</span>
+        </div>
+        <div class="board-chip board-chip--accent">
+            <span class="board-chip__label">Network score</span>
+            <span class="board-chip__value" id="avgRecentScore">—</span>
+            <span class="board-chip__sub" id="avgRecentScoreLabel"></span>
+        </div>
+    </section>
+
+    <section class="charts-row">
+        <div class="panel">
+            <h2>Reliability status breakdown</h2>
+            <p class="panel__caption" id="statusSummary">Share of recent trips by status</p>
+            <canvas id="statusChart" height="200"></canvas>
+            <div id="statusLegend" class="legend"></div>
+        </div>
+        <div class="panel">
+            <h2>Lowest scoring routes right now</h2>
+            <p class="panel__caption">Recent average score out of 100, lowest first</p>
+            <canvas id="worstRoutesChart" height="220"></canvas>
+        </div>
+    </section>
+
+    <section class="panel search-panel">
+        <h2>Find a route</h2>
+        <p class="panel__caption">Search by route number or a place name, e.g. "46A" or "Ringsend"</p>
+        <div class="search-row">
+            <input type="text" id="searchBox" placeholder="Route number or place name…">
+            <button id="searchButton">Search</button>
+            <button id="clearSearchButton" class="btn-ghost">Clear</button>
+        </div>
+
+        <div id="searchResultsSection" class="search-results" hidden>
+            <p id="searchResultsHeading" class="search-results__heading"></p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Historical score</th>
+                        <th>Live score</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody id="searchResultsTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel__heading-row">
+            <div>
+                <h2>All routes</h2>
+                <p class="panel__caption">Refreshes automatically every 5 seconds</p>
+            </div>
+        </div>
+        <table class="data-table" id="routesTable">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Historical score</th>
+                    <th>Trips logged</th>
+                    <th>Live score</th>
+                    <th>Live events</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody id="routesTableBody"></tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
