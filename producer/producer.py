@@ -1,20 +1,7 @@
-"""
-Main Producer — Dublin Bus Reliability Intelligence Platform.
+# Builds/loads the dataset, then replays it into the stream at a controlled rate.
+# PRODUCER_LOOP_FOREVER=true keeps it running as a background service instead of a one-shot script.
 
-Builds (or loads) the processed dataset, then replays it into the ingestion
-stream at a controlled rate (default: 1 record/second, configurable via
-REPLAY_DELAY_SECONDS). This is the "paced replay" pattern the module
-lecturers confirmed counts as a real stream: records arrive over time and
-are processed incrementally by the speed layer, rather than being read as
-one batch.
-
-Fixes the bug in the original submission where producer.py imported a
-`send_to_kinesis` function that was never defined — replay now goes through
-the shared stream_client abstraction (shared/stream_client.py), which works
-identically whether STREAM_BACKEND=local (no AWS needed) or
-STREAM_BACKEND=kinesis (real Kinesis Data Streams).
-"""
-
+import os
 import time
 
 from producer import config
@@ -32,9 +19,6 @@ def print_summary(data):
 
 
 def replay_to_stream(records, delay=None):
-    """Replay processed records into the configured stream backend at a
-    controlled rate."""
-
     delay = config.REPLAY_DELAY_SECONDS if delay is None else delay
     client = get_stream_client(backend=config.STREAM_BACKEND)
 
@@ -64,14 +48,29 @@ def main():
     print("DUBLIN BUS RELIABILITY INTELLIGENCE PLATFORM — PRODUCER")
     print("=" * 70)
 
-    processed = build_processed_dataset()
-    save_processed_dataset(processed)
-    print_summary(processed)
+    loop_forever = os.getenv("PRODUCER_LOOP_FOREVER", "false").lower() == "true"
+    cycle_sleep = float(os.getenv("PRODUCER_CYCLE_SLEEP_SECONDS", "30"))
 
-    print("\nSending records to the ingestion stream...")
-    replay_to_stream(processed)
+    cycle = 0
+    while True:
+        cycle += 1
+        if loop_forever:
+            print(f"\n--- Cycle {cycle} ---")
 
-    print("Producer completed successfully.")
+        processed = build_processed_dataset()
+        save_processed_dataset(processed)
+        print_summary(processed)
+
+        print("\nSending records to the ingestion stream...")
+        replay_to_stream(processed)
+
+        print("Producer cycle completed successfully.")
+
+        if not loop_forever:
+            break
+
+        print(f"Sleeping {cycle_sleep}s before next cycle...")
+        time.sleep(cycle_sleep)
 
 
 if __name__ == "__main__":
